@@ -75,7 +75,7 @@ GEM
     tilt (2.0.5)
     tins (1.12.0)
     tool (0.2.3)
-    yard (0.9.5)
+    yard (0.9.20)
 
 PLATFORMS
   ruby
