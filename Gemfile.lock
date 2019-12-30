@@ -1,7 +1,9 @@
 GIT
-  remote: git@github.com:sinatra/mustermann.git
-  revision: 4e7221d7fbcbc897e05fa088909caface9e7280e
+  remote: https://github.com/sinatra/mustermann.git
+  revision: db86e25f786c717dbe937d862a5ba0d35a58797b
   specs:
+    mustermann (1.1.0)
+      ruby2_keywords (~> 0.0.1)
     support (0.0.1)
       addressable
       coveralls
@@ -19,7 +21,7 @@ PATH
   remote: .
   specs:
     mustermann-grape (1.0.0)
-      mustermann (~> 1.0.0)
+      mustermann (>= 1.0.0)
 
 GEM
   remote: https://rubygems.org/
@@ -35,7 +37,6 @@ GEM
     diff-lcs (1.2.5)
     docile (1.1.5)
     json (2.0.2)
-    mustermann (1.0.0)
     public_suffix (2.0.3)
     rack (1.6.12)
     rack-protection (1.5.3)
@@ -60,6 +61,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.5.0)
     rspec-support (3.5.0)
+    ruby2_keywords (0.0.1)
     simplecov (0.12.0)
       docile (~> 1.1.0)
       json (>= 1.8, < 3)
