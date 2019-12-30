@@ -4,7 +4,7 @@ require "mustermann/grape/version"
 Gem::Specification.new do |s|
   s.name                  = "mustermann-grape"
   s.version               = Mustermann::Grape::VERSION
-  s.authors               = ["namusyaka", "Konstantin Haase"]
+  s.authors               = ["namusyaka", "Konstantin Haase", "Daniel Doubrovkine"]
   s.email                 = "namusyaka@gmail.com"
   s.homepage              = "https://github.com/ruby-grape/mustermann-grape"
   s.summary               = %q{Grape syntax for Mustermann}
