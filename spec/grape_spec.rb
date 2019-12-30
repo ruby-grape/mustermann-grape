@@ -1,11 +1,13 @@
-# -*- encoding: utf-8 -*-
+# frozen_string_literal: true
+
+require 'spec_helper'
+
 require 'support/env'
 require 'support/match_matcher'
 require 'support/expand_matcher'
 require 'support/pattern'
 require 'support/generate_template_matcher'
 require 'support/scan_matcher'
-require File.expand_path('lib/mustermann/grape')
 
 describe Mustermann::Grape do
   extend Support::Pattern
@@ -59,11 +61,11 @@ describe Mustermann::Grape do
   end
 
   pattern '/föö' do
-    it { should match("/f%C3%B6%C3%B6") }
+    it { should match('/f%C3%B6%C3%B6') }
   end
 
-  pattern "/:foo/:bar" do
-    it { should match('/foo/bar')               .capturing foo: 'foo',              bar: 'bar'     }
+  pattern '/:foo/:bar' do
+    it { should match('/foo/bar') .capturing foo: 'foo', bar: 'bar' }
     it { should_not match('/foo.bar/bar.foo')       }
     it { should_not match('/user@example.com/name') }
     it { should_not match('/10.1/te.st')            }
@@ -72,13 +74,13 @@ describe Mustermann::Grape do
     it { should_not match('/foo%2Fbar') }
     it { should_not match('/foo%2fbar') }
 
-    example { pattern.params('/bar/foo').should be == {"foo" => "bar", "bar" => "foo"} }
+    example { pattern.params('/bar/foo').should be == { 'foo' => 'bar', 'bar' => 'foo' } }
     example { pattern.params('').should be_nil }
 
     it { should generate_template('/{foo}/{bar}') }
   end
 
-  pattern "/{foo}/{bar}" do
+  pattern '/{foo}/{bar}' do
     it { should match('/foo/bar')               .capturing foo: 'foo',              bar: 'bar'     }
     it { should match('/foo.bar/bar.foo')       .capturing foo: 'foo.bar',          bar: 'bar.foo' }
     it { should match('/user@example.com/name') .capturing foo: 'user@example.com', bar: 'name'    }
@@ -88,7 +90,7 @@ describe Mustermann::Grape do
     it { should_not match('/foo%2Fbar') }
     it { should_not match('/foo%2fbar') }
 
-    example { pattern.params('/bar/foo').should be == {"foo" => "bar", "bar" => "foo"} }
+    example { pattern.params('/bar/foo').should be == { 'foo' => 'bar', 'bar' => 'foo' } }
     example { pattern.params('').should be_nil }
 
     it { should generate_template('/{foo}/{bar}') }
@@ -117,7 +119,7 @@ describe Mustermann::Grape do
     it { should_not expand(baz: '') }
 
     it { should_not match('/hello/world/') }
-    it { should generate_templates("", "/", "//", "//{bar}", "/{bar}", "/{foo}", "/{foo}/", "/{foo}/{bar}", "/{foo}{bar}", "{bar}", "{foo}", "{foo}/", "{foo}/{bar}", "{foo}{bar}") }
+    it { should generate_templates('', '/', '//', '//{bar}', '/{bar}', '/{foo}', '/{foo}/', '/{foo}/{bar}', '/{foo}{bar}', '{bar}', '{foo}', '{foo}/', '{foo}/{bar}', '{foo}{bar}') }
   end
 
   pattern '/:foo_bar' do
@@ -126,7 +128,7 @@ describe Mustermann::Grape do
   end
 
   pattern '/{foo.bar}' do
-    it { should match('/hello').capturing :"foo.bar" => 'hello' }
+    it { should match('/hello').capturing "foo.bar": 'hello' }
     it { should generate_template('/{foo.bar}') }
   end
 
@@ -136,7 +138,7 @@ describe Mustermann::Grape do
     it { should match('/foo/bar') .capturing splat: 'foo/bar' }
     it { should generate_template('/{+splat}') }
 
-    example { pattern.params('/foo').should be == {"splat" => ["foo"]} }
+    example { pattern.params('/foo').should be == { 'splat' => ['foo'] } }
   end
 
   pattern '/{+splat}' do
@@ -145,7 +147,7 @@ describe Mustermann::Grape do
     it { should match('/foo/bar') .capturing splat: 'foo/bar' }
     it { should generate_template('/{+splat}') }
 
-    example { pattern.params('/foo').should be == {"splat" => ["foo"]} }
+    example { pattern.params('/foo').should be == { 'splat' => ['foo'] } }
   end
 
   pattern '/*foo' do
@@ -154,8 +156,8 @@ describe Mustermann::Grape do
     it { should match('/foo/bar') .capturing foo: 'foo/bar' }
     it { should generate_template('/{+foo}') }
 
-    example { pattern.params('/foo')     .should be == {"foo" => "foo"     } }
-    example { pattern.params('/foo/bar') .should be == {"foo" => "foo/bar" } }
+    example { pattern.params('/foo')     .should be == { 'foo' => 'foo'     } }
+    example { pattern.params('/foo/bar') .should be == { 'foo' => 'foo/bar' } }
   end
 
   pattern '/{+foo}' do
@@ -164,8 +166,8 @@ describe Mustermann::Grape do
     it { should match('/foo/bar') .capturing foo: 'foo/bar' }
     it { should generate_template('/{+foo}') }
 
-    example { pattern.params('/foo')     .should be == {"foo" => "foo"     } }
-    example { pattern.params('/foo/bar') .should be == {"foo" => "foo/bar" } }
+    example { pattern.params('/foo')     .should be == { 'foo' => 'foo'     } }
+    example { pattern.params('/foo/bar') .should be == { 'foo' => 'foo/bar' } }
   end
 
   pattern '/*foo/*bar' do
@@ -179,25 +181,25 @@ describe Mustermann::Grape do
   end
 
   pattern '/:foo/*' do
-    it { should match("/foo/bar/baz")     .capturing foo: 'foo',   splat: 'bar/baz'   }
-    it { should match("/foo/")            .capturing foo: 'foo',   splat: ''          }
+    it { should match('/foo/bar/baz')     .capturing foo: 'foo',   splat: 'bar/baz'   }
+    it { should match('/foo/')            .capturing foo: 'foo',   splat: ''          }
     it { should match('/h%20w/h%20a%20y') .capturing foo: 'h%20w', splat: 'h%20a%20y' }
     it { should_not match('/foo') }
     it { should generate_template('/{foo}/{+splat}') }
 
-    example { pattern.params('/bar/foo').should be == {"splat" => ["foo"], "foo" => "bar"} }
-    example { pattern.params('/bar/foo/f%20o').should be == {"splat" => ["foo/f o"], "foo" => "bar"} }
+    example { pattern.params('/bar/foo').should be == { 'splat' => ['foo'], 'foo' => 'bar' } }
+    example { pattern.params('/bar/foo/f%20o').should be == { 'splat' => ['foo/f o'], 'foo' => 'bar' } }
   end
 
   pattern '/{foo}/*' do
-    it { should match("/foo/bar/baz")     .capturing foo: 'foo',   splat: 'bar/baz'   }
-    it { should match("/foo/")            .capturing foo: 'foo',   splat: ''          }
+    it { should match('/foo/bar/baz')     .capturing foo: 'foo',   splat: 'bar/baz'   }
+    it { should match('/foo/')            .capturing foo: 'foo',   splat: ''          }
     it { should match('/h%20w/h%20a%20y') .capturing foo: 'h%20w', splat: 'h%20a%20y' }
     it { should_not match('/foo') }
     it { should generate_template('/{foo}/{+splat}') }
 
-    example { pattern.params('/bar/foo').should be == {"splat" => ["foo"], "foo" => "bar"} }
-    example { pattern.params('/bar/foo/f%20o').should be == {"splat" => ["foo/f o"], "foo" => "bar"} }
+    example { pattern.params('/bar/foo').should be == { 'splat' => ['foo'], 'foo' => 'bar' } }
+    example { pattern.params('/bar/foo/f%20o').should be == { 'splat' => ['foo/f o'], 'foo' => 'bar' } }
   end
 
   pattern '/test$/' do
@@ -210,7 +212,7 @@ describe Mustermann::Grape do
     it { should_not match('/teest/') }
   end
 
-  pattern "/path with spaces" do
+  pattern '/path with spaces' do
     it { should match('/path%20with%20spaces') }
     it { should match('/path%2Bwith%2Bspaces') }
     it { should match('/path+with+spaces')     }
@@ -229,15 +231,15 @@ describe Mustermann::Grape do
   pattern '/*/:foo/*/*' do
     it { should match('/bar/foo/bling/baz/boom') }
 
-    it "should capture all splat parts" do
+    it 'should capture all splat parts' do
       match = pattern.match('/bar/foo/bling/baz/boom')
       match.captures.should be == ['bar', 'foo', 'bling', 'baz/boom']
-      match.names.should be == ['splat', 'foo']
+      match.names.should be == %w[splat foo]
     end
 
     it 'should map to proper params' do
       pattern.params('/bar/foo/bling/baz/boom').should be == {
-        "foo" => "foo", "splat" => ['bar', 'bling', 'baz/boom']
+        'foo' => 'foo', 'splat' => ['bar', 'bling', 'baz/boom']
       }
     end
   end
@@ -245,15 +247,15 @@ describe Mustermann::Grape do
   pattern '/{+splat}/{foo}/{+splat}/{+splat}' do
     it { should match('/bar/foo/bling/baz/boom') }
 
-    it "should capture all splat parts" do
+    it 'should capture all splat parts' do
       match = pattern.match('/bar/foo/bling/baz/boom')
       match.captures.should be == ['bar', 'foo', 'bling', 'baz/boom']
-      match.names.should be == ['splat', 'foo']
+      match.names.should be == %w[splat foo]
     end
 
     it 'should map to proper params' do
       pattern.params('/bar/foo/bling/baz/boom').should be == {
-        "foo" => "foo", "splat" => ['bar', 'bling', 'baz/boom']
+        'foo' => 'foo', 'splat' => ['bar', 'bling', 'baz/boom']
       }
     end
   end
@@ -274,7 +276,7 @@ describe Mustermann::Grape do
     it { should match('/pony正%2ejpg')        .capturing file: 'pony正',         ext: 'jpg' }
 
     it { should_not match('/pony正..jpg') }
-    it { should_not match('/.jpg')        }
+    it { should_not match('/.jpg') }
   end
 
   pattern '/(:a)x?' do
@@ -287,7 +289,7 @@ describe Mustermann::Grape do
   end
 
   pattern '/:user(@:host)?' do
-    it { should match('/foo@bar')     .capturing user: 'foo',     host: 'bar'     }
+    it { should match('/foo@bar') .capturing user: 'foo', host: 'bar' }
     it { should_not match('/foo.foo@bar') }
     it { should_not match('/foo@bar.bar') }
 
@@ -318,12 +320,12 @@ describe Mustermann::Grape do
   end
 
   pattern '/10/:id' do
-    it { should match('/10/test')  .capturing id: 'test'  }
+    it { should match('/10/test') .capturing id: 'test' }
     it { should_not match('/10/te.st') }
   end
 
   pattern '/10.1/:id' do
-    it { should match('/10.1/test')  .capturing id: 'test'  }
+    it { should match('/10.1/test') .capturing id: 'test' }
     it { should_not match('/10.1/te.st') }
   end
 
@@ -435,34 +437,34 @@ describe Mustermann::Grape do
     it { should match('/foo/bar/baz').capturing foo: 'foo', bar: 'bar', baz: 'baz' }
   end
 
-  pattern "/(foo|bar)" do
-    it { should match("/foo") }
-    it { should match("/bar") }
+  pattern '/(foo|bar)' do
+    it { should match('/foo') }
+    it { should match('/bar') }
   end
 
-  pattern "/(foo\\|bar)" do
-    it { should match             "/foo%7Cbar" }
-    it { should generate_template "/foo%7Cbar" }
+  pattern '/(foo\\|bar)' do
+    it { should match             '/foo%7Cbar' }
+    it { should generate_template '/foo%7Cbar' }
 
-    it { should_not match("/foo") }
-    it { should_not match("/bar") }
+    it { should_not match('/foo') }
+    it { should_not match('/bar') }
 
     it { should_not generate_template('/foo') }
     it { should_not generate_template('/bar') }
   end
 
-  pattern "/(:a/:b|:c)" do
-    it { should match("/foo")     .capturing c: 'foo'           }
-    it { should match("/foo/bar") .capturing a: 'foo', b: 'bar' }
+  pattern '/(:a/:b|:c)' do
+    it { should match('/foo')     .capturing c: 'foo'           }
+    it { should match('/foo/bar') .capturing a: 'foo', b: 'bar' }
 
     it { should expand(a: 'foo', b: 'bar') .to('/foo/bar') }
     it { should expand(c: 'foo')           .to('/foo')     }
     it { should_not expand(a: 'foo', b: 'bar', c: 'baz')   }
   end
 
-  pattern "/:a/:b|:c" do
-    it { should match("foo")      .capturing c: 'foo'           }
-    it { should match("/foo/bar") .capturing a: 'foo', b: 'bar' }
+  pattern '/:a/:b|:c' do
+    it { should match('foo')      .capturing c: 'foo'           }
+    it { should match('/foo/bar') .capturing a: 'foo', b: 'bar' }
 
     it { should generate_template('/{a}/{b}') }
     it { should generate_template('{c}')      }
@@ -551,7 +553,7 @@ describe Mustermann::Grape do
     it { should_not match('/foo1') }
   end
 
-  pattern '/:file(.:ext)?', capture: { ext: ['jpg', 'png'] } do
+  pattern '/:file(.:ext)?', capture: { ext: %w[jpg png] } do
     it { should match('/pony')         .capturing file: 'pony',     ext: nil   }
     it { should match('/pony.jpg')     .capturing file: 'pony',     ext: 'jpg' }
     it { should match('/pony%2Ejpg')   .capturing file: 'pony',     ext: 'jpg' }
@@ -570,7 +572,7 @@ describe Mustermann::Grape do
     it { should match('/pony')         .capturing file: 'pony',     ext: nil       }
     it { should match('/pony.jpg')     .capturing file: 'pony',     ext: '.jpg'    }
     it { should match('/pony.png')     .capturing file: 'pony',     ext: '.png'    }
-    it { should match('/pony.tar.gz')  .capturing file: 'pony',     ext: '.tar.gz'  }
+    it { should match('/pony.tar.gz')  .capturing file: 'pony',     ext: '.tar.gz' }
     it { should_not match('/pony.png.jpg') }
     it { should_not match('/pony.jpg.png') }
     it { should_not match('/pony.gif')     }
@@ -618,14 +620,14 @@ describe Mustermann::Grape do
     it { should_not match('/foo%2fbar') }
   end
 
-  pattern "/path with spaces", uri_decode: false do
+  pattern '/path with spaces', uri_decode: false do
     it { should     match('/path with spaces')     }
     it { should_not match('/path%20with%20spaces') }
     it { should_not match('/path%2Bwith%2Bspaces') }
     it { should_not match('/path+with+spaces')     }
   end
 
-  pattern "/path with spaces", space_matches_plus: false do
+  pattern '/path with spaces', space_matches_plus: false do
     it { should     match('/path%20with%20spaces') }
     it { should_not match('/path%2Bwith%2Bspaces') }
     it { should_not match('/path+with+spaces')     }
@@ -633,81 +635,81 @@ describe Mustermann::Grape do
 
   context 'invalid syntax' do
     example 'unexpected closing parenthesis' do
-      expect { Mustermann::Grape.new('foo)bar') }.
-        to raise_error(Mustermann::ParseError, 'unexpected ) while parsing "foo)bar"')
+      expect { Mustermann::Grape.new('foo)bar') }
+        .to raise_error(Mustermann::ParseError, 'unexpected ) while parsing "foo)bar"')
     end
 
     example 'missing closing parenthesis' do
-      expect { Mustermann::Grape.new('foo(bar') }.
-        to raise_error(Mustermann::ParseError, 'unexpected end of string while parsing "foo(bar"')
+      expect { Mustermann::Grape.new('foo(bar') }
+        .to raise_error(Mustermann::ParseError, 'unexpected end of string while parsing "foo(bar"')
     end
 
     example 'missing unescaped closing parenthesis' do
-      expect { Mustermann::Grape.new('foo(bar\)') }.
-        to raise_error(Mustermann::ParseError, 'unexpected end of string while parsing "foo(bar\\\\)"')
+      expect { Mustermann::Grape.new('foo(bar\)') }
+        .to raise_error(Mustermann::ParseError, 'unexpected end of string while parsing "foo(bar\\\\)"')
     end
 
     example '? at beginning of route' do
-      expect { Mustermann::Grape.new('?foobar') }.
-        to raise_error(Mustermann::ParseError, 'unexpected ? while parsing "?foobar"')
+      expect { Mustermann::Grape.new('?foobar') }
+        .to raise_error(Mustermann::ParseError, 'unexpected ? while parsing "?foobar"')
     end
 
     example 'double ?' do
-      expect { Mustermann::Grape.new('foo??bar') }.
-        to raise_error(Mustermann::ParseError, 'unexpected ? while parsing "foo??bar"')
+      expect { Mustermann::Grape.new('foo??bar') }
+        .to raise_error(Mustermann::ParseError, 'unexpected ? while parsing "foo??bar"')
     end
 
     example 'dangling escape' do
-      expect { Mustermann::Grape.new('foo\\') }.
-        to raise_error(Mustermann::ParseError, 'unexpected end of string while parsing "foo\\\\"')
+      expect { Mustermann::Grape.new('foo\\') }
+        .to raise_error(Mustermann::ParseError, 'unexpected end of string while parsing "foo\\\\"')
     end
   end
 
   context 'invalid capture names' do
     example 'empty name' do
-      expect { Mustermann::Grape.new('/:/') }.
-        to raise_error(Mustermann::CompileError, "capture name can't be empty: \"/:/\"")
+      expect { Mustermann::Grape.new('/:/') }
+        .to raise_error(Mustermann::CompileError, "capture name can't be empty: \"/:/\"")
     end
 
     example 'named splat' do
-      expect { Mustermann::Grape.new('/:splat/') }.
-        to raise_error(Mustermann::CompileError, "capture name can't be splat: \"/:splat/\"")
+      expect { Mustermann::Grape.new('/:splat/') }
+        .to raise_error(Mustermann::CompileError, "capture name can't be splat: \"/:splat/\"")
     end
 
     example 'named captures' do
-      expect { Mustermann::Grape.new('/:captures/') }.
-        to raise_error(Mustermann::CompileError, "capture name can't be captures: \"/:captures/\"")
+      expect { Mustermann::Grape.new('/:captures/') }
+        .to raise_error(Mustermann::CompileError, "capture name can't be captures: \"/:captures/\"")
     end
 
     example 'with capital letter' do
-      expect { Mustermann::Grape.new('/:Foo/') }.
-        to raise_error(Mustermann::CompileError, "capture name must start with underscore or lower case letter: \"/:Foo/\"")
+      expect { Mustermann::Grape.new('/:Foo/') }
+        .to raise_error(Mustermann::CompileError, 'capture name must start with underscore or lower case letter: "/:Foo/"')
     end
 
     example 'with integer' do
-      expect { Mustermann::Grape.new('/:1a/') }.
-        to raise_error(Mustermann::CompileError, "capture name must start with underscore or lower case letter: \"/:1a/\"")
+      expect { Mustermann::Grape.new('/:1a/') }
+        .to raise_error(Mustermann::CompileError, 'capture name must start with underscore or lower case letter: "/:1a/"')
     end
 
     example 'same name twice' do
-      expect { Mustermann::Grape.new('/:foo(/:bar)?/:bar?') }.
-        to raise_error(Mustermann::CompileError, "can't use the same capture name twice: \"/:foo(/:bar)?/:bar?\"")
+      expect { Mustermann::Grape.new('/:foo(/:bar)?/:bar?') }
+        .to raise_error(Mustermann::CompileError, "can't use the same capture name twice: \"/:foo(/:bar)?/:bar?\"")
     end
   end
 
   context 'Regexp compatibility' do
     describe :=== do
-      example('non-matching') { Mustermann::Grape.new("/")     .should_not be === '/foo' }
-      example('matching')     { Mustermann::Grape.new("/:foo") .should     be === '/foo' }
+      example('non-matching') { Mustermann::Grape.new('/')     .should_not be === '/foo' }
+      example('matching')     { Mustermann::Grape.new('/:foo') .should     be === '/foo' }
     end
 
     describe :=~ do
-      example('non-matching') { Mustermann::Grape.new("/")     .should_not be =~ '/foo' }
-      example('matching')     { Mustermann::Grape.new("/:foo") .should     be =~ '/foo' }
+      example('non-matching') { Mustermann::Grape.new('/')     .should_not be =~ '/foo' }
+      example('matching')     { Mustermann::Grape.new('/:foo') .should     be =~ '/foo' }
 
       context 'String#=~' do
-        example('non-matching') { "/foo".should_not be =~ Mustermann::Grape.new("/") }
-        example('matching')     { "/foo".should     be =~ Mustermann::Grape.new("/:foo") }
+        example('non-matching') { '/foo'.should_not be =~ Mustermann::Grape.new('/') }
+        example('matching')     { '/foo'.should     be =~ Mustermann::Grape.new('/:foo') }
       end
     end
 
@@ -722,31 +724,31 @@ describe Mustermann::Grape do
 
   context 'Proc compatibility' do
     describe :to_proc do
-      example { Mustermann::Grape.new("/").to_proc.should be_a(Proc) }
-      example('non-matching') { Mustermann::Grape.new("/")     .to_proc.call('/foo').should be == false }
-      example('matching')     { Mustermann::Grape.new("/:foo") .to_proc.call('/foo').should be == true  }
+      example { Mustermann::Grape.new('/').to_proc.should be_a(Proc) }
+      example('non-matching') { Mustermann::Grape.new('/')     .to_proc.call('/foo').should be == false }
+      example('matching')     { Mustermann::Grape.new('/:foo') .to_proc.call('/foo').should be == true  }
     end
   end
 
-  context "peeking" do
-    subject(:pattern) { Mustermann::Grape.new(":name") }
+  context 'peeking' do
+    subject(:pattern) { Mustermann::Grape.new(':name') }
 
     describe :peek_size do
-      example { pattern.peek_size("foo bar/blah")   .should be == "foo bar".size }
-      example { pattern.peek_size("foo%20bar/blah") .should be == "foo%20bar".size }
-      example { pattern.peek_size("/foo bar")       .should be_nil }
+      example { pattern.peek_size('foo bar/blah')   .should be == 'foo bar'.size }
+      example { pattern.peek_size('foo%20bar/blah') .should be == 'foo%20bar'.size }
+      example { pattern.peek_size('/foo bar')       .should be_nil }
     end
 
     describe :peek_match do
-      example { pattern.peek_match("foo bar/blah")   .to_s .should be == "foo bar" }
-      example { pattern.peek_match("foo%20bar/blah") .to_s .should be == "foo%20bar" }
-      example { pattern.peek_match("/foo bar")             .should be_nil }
+      example { pattern.peek_match('foo bar/blah')   .to_s .should be == 'foo bar' }
+      example { pattern.peek_match('foo%20bar/blah') .to_s .should be == 'foo%20bar' }
+      example { pattern.peek_match('/foo bar')             .should be_nil }
     end
 
     describe :peek_params do
-      example { pattern.peek_params("foo bar/blah")   .should be == [{"name" => "foo bar"}, "foo bar".size] }
-      example { pattern.peek_params("foo%20bar/blah") .should be == [{"name" => "foo bar"}, "foo%20bar".size] }
-      example { pattern.peek_params("/foo bar")       .should be_nil }
+      example { pattern.peek_params('foo bar/blah')   .should be == [{ 'name' => 'foo bar' }, 'foo bar'.size] }
+      example { pattern.peek_params('foo%20bar/blah') .should be == [{ 'name' => 'foo bar' }, 'foo%20bar'.size] }
+      example { pattern.peek_params('/foo bar')       .should be_nil }
     end
   end
 end

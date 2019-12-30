@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'mustermann'
 require 'mustermann/ast/pattern'
 
@@ -12,23 +14,23 @@ module Mustermann
   class Grape < AST::Pattern
     register :grape
 
-    on(nil, ??, ?)) { |c| unexpected(c) }
+    on(nil, '?', ')') { |c| unexpected(c) }
 
-    on(?*)  { |c| scan(/\w+/) ? node(:named_splat, buffer.matched) : node(:splat) }
-    on(?:)  { |c| node(:capture, constraint: "[^/\\?#\.]") { scan(/\w+/) } }
-    on(?\\) { |c| node(:char, expect(/./)) }
-    on(?()  { |c| node(:optional, node(:group) { read unless scan(?)) }) }
-    on(?|)  { |c| node(:or) }
+    on('*')  { |_c| scan(/\w+/) ? node(:named_splat, buffer.matched) : node(:splat) }
+    on(':')  { |_c| node(:capture, constraint: "[^/\\?#\.]") { scan(/\w+/) } }
+    on('\\') { |_c| node(:char, expect(/./)) }
+    on('(')  { |_c| node(:optional, node(:group) { read unless scan(')') }) }
+    on('|')  { |_c| node(:or) }
 
-    on ?{ do |char|
-      type = scan(?+) ? :named_splat : :capture
+    on '{' do |_char|
+      type = scan('+') ? :named_splat : :capture
       name = expect(/[\w\.]+/)
-      type = :splat if type == :named_splat and name == 'splat'
-      expect(?})
+      type = :splat if (type == :named_splat) && (name == 'splat')
+      expect('}')
       node(type, name)
     end
 
-    suffix ?? do |char, element|
+    suffix '?' do |_char, element|
       node(:optional, element)
     end
   end

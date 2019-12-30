@@ -2,6 +2,8 @@
 
 This gem implements the `grape` pattern type for Mustermann.
 
+[![Build Status](https://travis-ci.org/ruby-grape/mustermann-grape.svg?branch=master)](https://travis-ci.org/ruby-grape/mustermann-grape)
+
 ## Overview
 
 **Supported options:**
