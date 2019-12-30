@@ -39,7 +39,7 @@ GEM
     json (2.0.2)
     public_suffix (2.0.3)
     rack (1.6.12)
-    rack-protection (1.5.3)
+    rack-protection (1.5.5)
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
