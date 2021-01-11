@@ -48,7 +48,7 @@ GEM
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rake (13.0.1)
-    redcarpet (3.5.0)
+    redcarpet (3.5.1)
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rspec (3.9.0)
