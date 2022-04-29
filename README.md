@@ -2,7 +2,7 @@
 
 This gem implements the `grape` pattern type for Mustermann.
 
-[![Build Status](https://travis-ci.org/ruby-grape/mustermann-grape.svg?branch=master)](https://travis-ci.org/ruby-grape/mustermann-grape)
+[![tests](https://github.com/ruby-grape/mustermann-grape/workflows/tests/badge.svg)](https://github.com/ruby-grape/mustermann-grape/actions?query=workflow%3Atests)
 
 ## Overview
 
