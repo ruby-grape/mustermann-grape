@@ -7,12 +7,17 @@ This gem implements the `grape` pattern type for Mustermann.
 ## Overview
 
 **Supported options:**
-`capture`, `except`, `greedy`, `space_matches_plus`, `uri_decode`, `converters` and `ignore_unknown_options`
+`capture`, `converters`, `except`, `greedy`, `ignore_unknown_options`, `params`, `space_matches_plus` and `uri_decode`
 
 ``` ruby
 require 'mustermann/grape'
 
 Mustermann.new('/:id', type: :grape).params('/foo') # => { id: 'foo' }
+
+# Providing params option
+Mustermann.new('/:id', type: :grape, params: {"id"=>{:type=>"Integer"}}).params('/1') # => { id: '1'}
+Mustermann.new('/:id', type: :grape, params: {"id"=>{:type=>"Integer"}}).params('/foo') # => nil
+Mustermann.new('/:id', type: :grape, params: {"id"=>{:type=>"String"}}).params('/foo') # => { id: 'foo'}
 ```
 
 ## Syntax
