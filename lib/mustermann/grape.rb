@@ -13,11 +13,28 @@ module Mustermann
   # @see file:README.md#grape Syntax description in the README
   class Grape < AST::Pattern
     register :grape
+    supported_options :params
 
     on(nil, '?', ')') { |c| unexpected(c) }
 
     on('*')  { |_c| scan(/\w+/) ? node(:named_splat, buffer.matched) : node(:splat) }
-    on(':')  { |_c| node(:capture, constraint: "[^/\\?#\.]") { scan(/\w+/) } }
+    on(':')  do |_c|
+      param_name = scan(/\w+/)
+      return node(:capture, param_name, constraint: "[^/\\?#\.]") { scan(/\w+/) } unless pattern
+
+      params_opt = pattern.options[:params]
+      if params_opt && params_opt[param_name] && params_opt[param_name][:type]
+        param_type = params_opt[param_name][:type]
+        case(param_type)
+        when "Integer"
+          node(:capture, param_name, constraint: /\d/) { scan(/\w+/) }
+        else
+          node(:capture, param_name, constraint: "[^/\\?#\.]") { scan(/\w+/) }
+        end
+      else
+        node(:capture, param_name, constraint: "[^/\\?#\.]") { scan(/\w+/) }
+      end
+    end
     on('\\') { |_c| node(:char, expect(/./)) }
     on('(')  { |_c| node(:optional, node(:group) { read unless scan(')') }) }
     on('|')  { |_c| node(:or) }

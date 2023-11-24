@@ -751,4 +751,33 @@ describe Mustermann::Grape do
       example { pattern.peek_params('/foo bar')       .should be_nil }
     end
   end
+
+  context 'when params option is provided' do
+    context 'and they contain parameters information' do
+      pattern '/foo/:id', params: {"id"=>{:type=>"Integer"}} do
+        it { should     match('/foo/1')     }
+        it { should_not match('/foo/bar') }
+      end
+
+      context 'and inherit routes are present' do
+        pattern '/foo/:id/bar/:reference', params: {"id"=>{:type=>"Integer"}, "reference"=>{:type=>"String"}} do
+          it { should     match('/foo/1/bar/wadus')     }
+          it { should_not match('/foo/bar/bar/wadus') }
+        end
+
+        pattern '/foo/:id/bar/:reference', params: {"id"=>{:type=>"Integer"}, "reference"=>{:type=>"Integer"}} do
+          it { should     match('/foo/1/bar/1')     }
+          it { should_not match('/foo/1/bar/wadus') }
+          it { should_not match('/foo/bar/bar/1') }
+        end
+      end
+    end
+
+    context 'and they do NOT contain parameters information' do
+      pattern '/foo/:id' do
+        it { should match('/foo/1') }
+        it { should match('/foo/bar') }
+      end
+    end
+  end
 end
