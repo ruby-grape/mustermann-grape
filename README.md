@@ -2,6 +2,14 @@
 
 This gem implements the `grape` pattern type for Mustermann.
 
+## Retirement notice
+
+**This adapter is retired; no further development is planned in this repository.** Starting with [Grape 3.3.0](https://rubygems.org/gems/grape/versions/3.3.0), released June 20, 2026, Grape maintains its path-pattern grammar internally as `Grape::Router::MustermannPattern` and depends on `mustermann` directly instead of `mustermann-grape` ([grape#2755](https://github.com/ruby-grape/grape/pull/2755)). Current Grape applications do not need this adapter; normal Grape routing requires no migration.
+
+Existing [RubyGems releases](https://rubygems.org/gems/mustermann-grape) remain available for older Grape versions that depend on this gem and for applications using the adapter directly. Retiring this repository does not remove those releases.
+
+If your application calls `Mustermann.new(pattern, type: :grape)`, keep an explicit `gem 'mustermann-grape'` dependency and `require 'mustermann/grape'`. Grape's internal pattern class does not register `type: :grape` and is not a public replacement for that standalone API. Report routing issues affecting current Grape in the [Grape repository](https://github.com/ruby-grape/grape/issues).
+
 [![tests](https://github.com/ruby-grape/mustermann-grape/workflows/tests/badge.svg)](https://github.com/ruby-grape/mustermann-grape/actions?query=workflow%3Atests)
 
 ## Overview
